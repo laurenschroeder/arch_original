@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    <script src="http://172.16.3.183:8080/target/target-script-min.js#anonymous"></script>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+     <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/databaseHandler.js"></script> 
+    <script type="text/javascript" src="js/eventHandler.js"></script>
+    <script type="text/javascript" src="js/userHandler.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+
+    <title>Hello World</title>
+</head>
+
+<body>
+
+
+    <div data-role="page" id="addpage">
+        <div data-role="panel" id="addPagePanel">
+            <h1>Menu</h1>
+            <ul data-role='listview' data-inset="true">
+                <li data-role="list-divider">Events</li>
+                <li data-icon="plus"><a href='#addpage'>Add</a></li>
+                <li data-icon="grid"><a href='#loadpage'>Load</a></li>
+            </ul>
+        </div>
+    
+    <div data-role="header" data-position="fixed">
+        <a href="#addPagePanel"
+            class="ui-btn ui-icon-bars ui-shadow ui-btn-icon-notext ui-corner-all"></a>
+        <h1>Hello WhereWolf</h1>
+
+        <div class="fb-login-button" data-max-rows="1" data-size="large" data-button-type="continue_with" data-show-faces="false" data-auto-logout-link="true" data-use-continue-as="true"></div>
+
+    </div>
+
+
+    <div data-role="main" class="ui-content">
+
+            <form>
+                <div class = "ui-field-contain">
+                    <label for = "givenTitle">Give Your Activity a Title*</label>
+                    <input id="givenTitle" type="text" data-clear-btn="true" />
+                    <label for = "day">What Day?*</label>
+                    <input id="givenDay" type="text" data-clear-btn="true" />
+                    <label for = "time">What Time?*</label>
+                    <input id="givenTime" type="text" data-clear-btn="true" />
+                    <label for = "location">Where?*</label>
+                    <input id="givenLocation" type="text" data-clear-btn="true" />
+                    <label for="btnAdd"></label>
+                    <a class="ui-btn  ui-icon-plus ui-btn-icon-left" id="btnAdd" onclick="addEvent()">Add</a>
+                </div>
+            </form>
+
+
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h1>Where Lone Wolves Meet</h1>
+        </div>
+    </div>
+
+ 
+    <div data-role="page" id="loadpage">
+        <div data-role="panel" id="loadPagePanel">
+            <h1>Menu</h1>
+            <ul data-role='listview' data-inset="true">
+                <li data-role="list-divider">Events</li>
+                <li data-icon="plus"><a href='#addpage'>Add</a></li>
+                <li data-icon="grid"><a href='#loadpage'>Load</a></li>
+            </ul>
+        </div>
+        <div data-role="header" data-position="fixed">
+            <a href="#loadPagePanel"
+            class="ui-btn ui-icon-bars ui-shadow ui-btn-icon-notext ui-corner-all"></a>
+
+            <h1>Load events</h1>
+        </div>
+        <div data-role="main" class="ui-content">
+            <ul data-role="listview" id="lstEvents"></ul>
+            <a href="#popupUpdateDelete" data-rel="popup" class="ui-btn">Popup</a>
+            <div data-role="popup" id="popupUpdateDelete">
+                <div class="update-delete-header" data-role="header">
+                    <a class="ui-btn ui-icon-delete ui-btn-icon-notext ui-corner-all" data-rel="back"/></a> 
+                    <h1>Update/Delete Menu</h1>
+                    <a class="ui-btn ui-icon-delete ui-btn-icon-left ui-btn-inline" onclick="deleteEvents()">Delete</a>
+                    <a class="ui-btn ui-icon-edit ui-btn-icon-left ui-btn-inline">Edit</a>
+                </div>
+            <div data-role="main" class="ui-content">
+                Here's the event. Here's the extra notes. Here's who's going. Want to go? Yeah? Chat?
+            </div>
+        </div>
+        <div data-role="footer" data-position="fixed">
+            <h1>www.wherewolf.io</h1>
+        </div>
+        
+
+
+       
+    <script type="text/javascript">
+    //todo change to look at what user is logged in
+    var usertest="user";
+    if (usertest=="user"){
+    $("div.update-delete-header").show();
+    }
+
+        app.initialize();
+    </script>
+
+
+<script>
+
+
+  // This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+        
+        //too:fb.api may become unnecessary with getfbuserdata
+        //https://www.codexworld.com/login-with-facebook-using-javascript-sdk/
+      // Logged into your app and Facebook.
+       FB.api('/me?fields=name,id,email,birthday,location,locale,age_range,picture,currency,first_name,last_name,name_format,gender,cover.type(large)', function(response) {
+            first_name=response.first_name;
+            //getFbUserData(response);
+            console.log(response.picture.data.url);
+            userHandler.addUser(response);
+
+    });
+      accessToken = response.authResponse.accessToken; //get unique user accessToken, made it global myself
+      testAPI();
+    } else {
+      // The person is not logged into your app or we are unable to tell.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this app.';
+    }
+  }
+
+  // This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    });
+  }
+
+  window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1990307151250899',
+    cookie     : true,  // enable cookies to allow the server to access 
+                        // the session
+    xfbml      : true,  // parse social plugins on this page
+    version    : 'v2.8' // use graph api version 2.8
+  });
+
+  // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+
+  };
+
+  // Load the SDK asynchronously (rest of page can load w/o)
+  (function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js";
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));
+
+  // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+
+
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      name_fb=response.name;
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+
+
+    });
+  }
+
+// Fetch the user profile data from facebook
+function getFbUserData(response){
+    FB.api('/me', {locale: 'en_US', fields: 'id,first_name,last_name,email,link,gender,locale,picture'},
+    function (response) {
+        //document.getElementById('fbLink').setAttribute("onclick","fbLogout()");
+        //document.getElementById('fbLink').innerHTML = 'Logout from Facebook';
+        document.getElementById('status').innerHTML = 'Thanks for logging in, ' + response.first_name + '!';
+        document.getElementById('userData').innerHTML = '<p><b>FB ID:</b> '+response.id+'</p><p><b>Name:</b> '+response.first_name+' '+response.last_name+'</p><p><b>Email:</b> '+response.email+'</p><p><b>Gender:</b> '+response.gender+'</p><p><b>Locale:</b> '+response.locale+'</p><p><b>Picture:</b> <img src="'+response.picture.data.url+'"/></p><p><b>FB Profile:</b> <a target="_blank" href="'+response.link+'">click to view profile</a></p>';
+
+         
+    });
+}
+
+// Logout from facebook
+function fbLogout() {
+    FB.logout(function() {
+        document.getElementById('fbLink').setAttribute("onclick","fbLogin()");
+        document.getElementById('fbLink').innerHTML = '<img src="fblogin.png"/>';
+        document.getElementById('userData').innerHTML = '';
+        document.getElementById('status').innerHTML = 'You have successfully logout from Facebook.';
+    });
+}
+
+</script>
+
+<!--
+  Below we include the Login Button social plugin. This button uses
+  the JavaScript SDK to present a graphical Login button that triggers
+  the FB.login() function when clicked.
+-->
+
+<fb:login-button scope="public_profile,email" onlogin="checkLoginState();">
+</fb:login-button>
+
+<div id="status">
+</div>
+
+
+<!-- Facebook login or logout button -->
+
+<a href="javascript:void(0);" onclick="FB.login(scope="public_profile, email");
+" id="fbLink"><img src="fblogin.png"/></a>
+
+
+<!-- Display user profile data -->
+<div id="userData"></div>
+
+<div
+  class="fb-like"
+  data-share="true"
+  data-width="450"
+  data-show-faces="true">
+</div>
+
+    </div>
+    <script type="text/javascript">
+        app.initialize();
+    </script>
+
+
+
+ </body>
+
+</html>
